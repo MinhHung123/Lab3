@@ -1,0 +1,5 @@
+../Core/Src/input_reading.c:30:6:button_init	2
+../Core/Src/input_reading.c:41:6:button_reading	12
+../Core/Src/input_reading.c:83:5:is_button_pressed	3
+../Core/Src/input_reading.c:92:5:is_button_pressed_1s	3
+../Core/Src/input_reading.c:98:5:is_button_down	2

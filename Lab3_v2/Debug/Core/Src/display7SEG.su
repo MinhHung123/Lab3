@@ -1,0 +1,4 @@
+../Core/Src/display7SEG.c:10:6:display7SEG	24	static
+../Core/Src/display7SEG.c:25:6:unable_led_7SEG	8	static
+../Core/Src/display7SEG.c:32:6:update7SEG	16	static
+../Core/Src/display7SEG.c:55:6:updateLedBuffer	32	static

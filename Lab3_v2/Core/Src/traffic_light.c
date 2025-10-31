@@ -17,6 +17,8 @@ enum TrafficState {
 static enum TrafficState status = INIT;
 int counter1 = 0, counter2 = 0;
 int red = 7000, grn = 5000, yel = 2000;
+int tmp_red = 7000, tmp_grn = 5000, tmp_yel = 2000;
+int configue = 0;
 
 void fsm_traffic_run(){
 	switch (status){
@@ -38,7 +40,7 @@ void fsm_traffic_run(){
 		}
 		if(is_button_pressed(0)){
 			HAL_GPIO_WritePin(LED_RED_SGN_GPIO_Port, LED_RED_SGN_Pin, 1);
-			setTimer(2, 500);
+			start_config();
 			status = RED_CONFIG;
 		}
 		if(isTimerExperied(1)){
@@ -60,7 +62,7 @@ void fsm_traffic_run(){
 		}
 		if(is_button_pressed(0)){
 			HAL_GPIO_WritePin(LED_RED_SGN_GPIO_Port, LED_RED_SGN_Pin, 0);
-			setTimer(2, 500);
+			start_config();
 			status = RED_CONFIG;
 		}
 		if(isTimerExperied(1)){
@@ -92,7 +94,7 @@ void fsm_traffic_run(){
 		}
 		if(is_button_pressed(0)){
 			HAL_GPIO_WritePin(LED_RED_SGN_GPIO_Port, LED_RED_SGN_Pin, 0);
-			setTimer(2, 500);
+			start_config();
 			status = RED_CONFIG;
 		}
 		break;
@@ -109,7 +111,7 @@ void fsm_traffic_run(){
 		}
 		if(is_button_pressed(0)){
 			HAL_GPIO_WritePin(LED_RED_SGN_GPIO_Port, LED_RED_SGN_Pin, 1);
-			setTimer(2, 500);
+			start_config();
 			status = RED_CONFIG;
 		}
 		break;
@@ -118,6 +120,8 @@ void fsm_traffic_run(){
 		show_config_val();
 		if(is_button_pressed(0)) status = YEL_CONFIG;
 		if(is_button_pressed(2)){
+			configue = 0;
+			red = tmp_red; grn = tmp_grn; yel = tmp_yel;
 			ensure_red_time();
 			status = INIT;
 		}
@@ -127,6 +131,8 @@ void fsm_traffic_run(){
 		show_config_val();
 		if(is_button_pressed(0)) status = GRN_CONFIG;
 		if(is_button_pressed(2)) {
+			configue = 0;
+			red = tmp_red; grn = tmp_grn; yel = tmp_yel;
 			ensure_yel_time();
 			status = INIT;
 		}
@@ -134,8 +140,15 @@ void fsm_traffic_run(){
 	case GRN_CONFIG:
 		turn_grn_blinky();
 		show_config_val();
-		if(is_button_pressed(0)) status = RED_CONFIG;
+		if(is_button_pressed(0)) {
+			ensure_grn_time();
+			ensure_red_time();
+			ensure_yel_time();
+			status = INIT;
+		}
 		if(is_button_pressed(2)){
+			configue = 0;
+			red = tmp_red; grn = tmp_grn; yel = tmp_yel;
 			ensure_grn_time();
 			status = INIT;
 		}
@@ -149,33 +162,42 @@ void show_config_val(void){
 	int v = 0;
 	switch (status){
 	case RED_CONFIG:
-		v = red / 1000;
+		v = tmp_red / 1000;
 		break;
 	case YEL_CONFIG:
-		v = yel / 1000;
+		v = tmp_yel / 1000;
 		break;
 	case GRN_CONFIG:
-		v = grn / 1000;
+		v = tmp_grn / 1000;
 		break;
 	default:
 		break;
 	}
-	if(v>99) v = 1;
 	updateLedBuffer(v, v);
+}
+
+static void start_config(void){
+	if(!configue){
+		tmp_red = red;
+		tmp_grn = grn;
+		tmp_yel = yel;
+		configue = 1;
+	}
+	setTimer(2, 500);
 }
 
 void short_press_increase(void){
 	switch (status){
 	case RED_CONFIG:
-		red += 1000; if (red > 99000) red = 99000;
+		tmp_red += 1000; if (tmp_red > 99000) tmp_red = 1000;
 		show_config_val();
 		break;
 	case YEL_CONFIG:
-		yel += 1000; if (yel > 99000) yel = 99000;
+		tmp_yel += 1000; if (tmp_yel > 99000) tmp_yel = 1000;
 		show_config_val();
 		break;
 	case GRN_CONFIG:
-		grn += 1000; if (grn > 99000) grn = 99000;
+		tmp_grn += 1000; if (grn > 99000) tmp_grn = 1000;
 		show_config_val();
 		break;
 	default:

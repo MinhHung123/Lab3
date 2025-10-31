@@ -253,7 +253,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 int cur = 0;
-int counter = 15;
+int counter = 20;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim->Instance == TIM2){
 		button_reading();
@@ -261,7 +261,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	}
 	counter--;
 	if(counter<=0){
-		counter = 25;
+		counter = 20;
 		update7SEG(cur++);
 		if(cur >= 4) cur = 0;
 	}
